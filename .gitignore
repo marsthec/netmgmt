@@ -1,0 +1,3 @@
+ansible_data/.*
+ansible_data/artifacts
+ansible_data/env

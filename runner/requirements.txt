@@ -1,0 +1,9 @@
+ansible-runner
+ansible
+ansible-core
+netaddr
+pyats
+genie
+ciscoconfparse
+pynetbox
+pika

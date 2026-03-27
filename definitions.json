@@ -1,0 +1,48 @@
+{
+    "users": [
+        {
+            "name": "admin",
+            "password": "admin",
+            "tags": [
+                "administrator"
+            ]
+        },
+        {
+            "name": "ansible_worker",
+            "password": "worker_pass",
+            "tags": [
+                "management"
+            ]
+        }
+    ],
+    "vhosts": [
+        {
+            "name": "/"
+        }
+    ],
+    "permissions": [
+        {
+            "user": "admin",
+            "vhost": "/",
+            "configure": ".*",
+            "write": ".*",
+            "read": ".*"
+        },
+        {
+            "user": "ansible_worker",
+            "vhost": "/",
+            "configure": "^netbox_tasks$",
+            "write": "^(netbox_tasks|amq\\.default)$",
+            "read": "^netbox_tasks$"
+        }
+    ],
+    "queues": [
+        {
+            "name": "netbox_tasks",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        }
+    ]
+}

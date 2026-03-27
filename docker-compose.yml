@@ -1,0 +1,52 @@
+version: '3.8'
+name: netmgmt
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - netbox_network
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbitmq_management load_definitions \"/etc/rabbitmq/definitions.json\""
+    volumes:
+      - ./definitions.json:/etc/rabbitmq/definitions.json
+
+  ansible-worker:
+    build:
+      context: runner
+      dockerfile: Dockerfile
+    command: python3 /app/worker.py
+    depends_on:
+      - rabbitmq
+    volumes:
+      - ./ansible_data:/ansible
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa:ro
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_USER=ansible_worker
+      - RABBIT_PASS=worker_pass
+    networks:
+      - netbox_network
+
+  webhook-proxy:
+      image: python:3.12-slim
+      command: >
+        sh -c "pip install fastapi uvicorn pika && 
+              python /app/webhook_proxy.py"
+      volumes:
+        - ./webhook_proxy.py:/app/webhook_proxy.py
+      environment:
+        - RABBIT_HOST=rabbitmq
+        - RABBIT_USER=ansible_worker
+        - RABBIT_PASS=worker_pass
+      networks:
+        - netbox_network
+
+networks:
+  netbox_network:
+    external: true

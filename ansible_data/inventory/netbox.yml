@@ -1,0 +1,23 @@
+plugin: netbox.netbox.nb_inventory
+api_endpoint: http://netbox:8080
+validate_certs: false
+config_context: true
+token: 28VMbmI9OBBiwFJXA0SR551EoqjQhGs3MaTiOpbZ
+timeout: 120
+compose:
+  ansible_connection: config_context.ansible_connection
+  ansible_network_os: config_context.ansible_network_os
+  ansible_network_cli_ssh_type: config_context.ansible_network_cli_ssh_type
+  ansible_ssh_common_args: config_context.ansible_ssh_common_args
+  ansible_connect_timeout: config_context.ansible_connect_timeout
+  ansible_command_timeout: config_context.ansible_command_timeout
+  persistent_connect_timeout: config_context.persistent_connect_timeout
+  persistent_command_timeout: config_context.persistent_command_timeout
+group_by:
+  - device_roles
+  - sites
+# query_filters:
+#   - site__status: 'active'
+device_query_filters:
+  - has_primary_ip: 'true'
+  - status: 'active'
